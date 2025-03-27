@@ -1,0 +1,805 @@
+kind: BotDefinition
+entity:
+  schemaName: crb40_ecoRoutePlanner
+  cdsBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+  accessControlPolicy: ChatbotReaders
+  authenticationMode: Integrated
+  authenticationTrigger: Always
+  configuration:
+    gPTSettings:
+      defaultSchemaName: crb40_ecoRoutePlanner.gpt.default
+
+    aISettings:
+      useModelKnowledge: true
+      isSemanticSearchEnabled: true
+      optInUseLatestModels: false
+
+  language: 1033
+
+components:
+  - kind: DialogComponent
+    version: 17209421
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Greeting
+    id: 050bd169-b55b-409f-a110-831909c503a8
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This topic is triggered when the user greets the agent.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Greeting
+    dialog:
+      beginDialog:
+        kind: OnRecognizedIntent
+        id: main
+        intent:
+          displayName: Greeting
+          includeInOnSelectIntent: false
+          triggerQueries:
+            - Good afternoon
+            - Good morning
+            - Hello
+            - Hey
+            - Hi
+
+        actions:
+          - kind: SendActivity
+            id: sendMessage_abmysR
+            activity:
+              text:
+                - Hello, how can I help you today?
+              speak:
+                - Hello, <break strength="medium" /> how can I help?
+
+          - kind: CancelAllDialogs
+            id: cancelAllDialogs_01At22
+
+  - kind: DialogComponent
+    version: 17209411
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Goodbye
+    id: 107f5cfa-772b-4819-9f36-97cb119ff203
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This topic triggers when the user says goodbye. By default, it does not end the conversation. If you would like to end the conversation when the user says goodbye, you can add an "End of Conversation" action to this topic, or redirect to the "End of Conversation" system topic.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Goodbye
+    dialog:
+      startBehavior: CancelOtherTopics
+      beginDialog:
+        kind: OnRecognizedIntent
+        id: main
+        intent:
+          displayName: Goodbye
+          includeInOnSelectIntent: false
+          triggerQueries:
+            - Bye
+            - Bye for now
+            - Bye now
+            - Good bye
+            - No thank you. Goodbye.
+            - See you later
+
+        actions:
+          - kind: Question
+            id: question_zf2HhP
+            variable: Topic.EndConversation
+            prompt: Would you like to end our conversation?
+            entity: BooleanPrebuiltEntity
+
+          - kind: ConditionGroup
+            id: condition_DGc1Wy
+            conditions:
+              - id: condition_DGc1Wy-item-0
+                condition: =Topic.EndConversation = true
+                actions:
+                  - kind: BeginDialog
+                    id: dn94DC
+                    dialog: crb40_ecoRoutePlanner.topic.EndofConversation
+
+              - id: condition_DGc1Wy-item-1
+                condition: =Topic.EndConversation = false
+                actions:
+                  - kind: SendActivity
+                    id: sendMessage_LdLhmf
+                    activity: Go ahead. I'm listening.
+
+  - kind: DialogComponent
+    version: 17209401
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:47.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:47.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Conversational boosting
+    id: 129c2550-f778-42e5-9cc7-e9dfd6c01628
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: Create generative answers from knowledge sources.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Search
+    dialog:
+      beginDialog:
+        kind: OnUnknownIntent
+        id: main
+        priority: -1
+        actions:
+          - kind: SearchAndSummarizeContent
+            id: search-content
+            variable: Topic.Answer
+            userInput: =System.Activity.Text
+
+          - kind: ConditionGroup
+            id: has-answer-conditions
+            conditions:
+              - id: has-answer
+                condition: =!IsBlank(Topic.Answer)
+                actions:
+                  - kind: EndDialog
+                    id: end-topic
+                    clearTopicQueue: true
+
+  - kind: DialogComponent
+    version: 17209416
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Multiple Topics Matched
+    id: 14aeaaf5-4065-4dd2-800c-1971e6a686d7
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This system topic triggers when the agent matches multiple Topics with the incoming message and needs to clarify which one should be triggered.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.MultipleTopicsMatched
+    dialog:
+      beginDialog:
+        kind: OnSelectIntent
+        id: main
+        triggerBehavior: Always
+        actions:
+          - kind: SetVariable
+            id: setVariable_M6434i
+            variable: init:Topic.IntentOptions
+            value: =System.Recognizer.IntentOptions
+
+          - kind: SetTextVariable
+            id: setTextVariable_0
+            variable: Topic.NoneOfTheseDisplayName
+            value: None of these
+
+          - kind: EditTable
+            id: sendMessage_g5Ls09
+            changeType: Add
+            itemsVariable: Topic.IntentOptions
+            value: "={ DisplayName: Topic.NoneOfTheseDisplayName, TopicId: \"NoTopic\", TriggerId: \"NoTrigger\", Score: 1.0 }"
+
+          - kind: Question
+            id: question_zf2HhP
+            interruptionPolicy:
+              allowInterruption: false
+
+            alwaysPrompt: true
+            variable: System.Recognizer.SelectedIntent
+            prompt: "To clarify, did you mean:"
+            entity:
+              kind: DynamicClosedListEntity
+              items: =Topic.IntentOptions
+
+          - kind: ConditionGroup
+            id: conditionGroup_60PuXb
+            conditions:
+              - id: conditionItem_rs7GgM
+                condition: =System.Recognizer.SelectedIntent.TopicId = "NoTopic"
+                actions:
+                  - kind: ReplaceDialog
+                    id: YZXRDb
+                    dialog: crb40_ecoRoutePlanner.topic.Fallback
+
+  - kind: DialogComponent
+    version: 17209445
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:49.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:49.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Sign in 
+    id: 1bf1284d-8eba-4a0b-a39a-7e36e27683e9
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This system topic triggers when the agent needs to sign in the user or require the user to sign in
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Signin
+    dialog:
+      beginDialog:
+        kind: OnSignIn
+        id: main
+        actions:
+          - kind: ConditionGroup
+            id: conditionGroup_ypjGKL
+            conditions:
+              - id: conditionItem_7XYIIR
+                condition: =System.SignInReason = SignInReason.SignInRequired
+                actions:
+                  - kind: SendActivity
+                    id: sendMessage_1jHUNO
+                    activity: Hello! To be able to help you, I'll need you to sign in.
+
+          - kind: OAuthInput
+            id: gOjhZA
+            title: Login
+            text: To continue, please login
+
+  - kind: KnowledgeSourceComponent
+    version: 17209535
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:06:27.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:06:27.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Belgeler
+    id: 30410aa4-ca16-401b-ab2a-5af96eff1db3
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This knowledge source provides information found in Belgeler SharePoint.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Belgeler_BvKnwzswdeAgJMvtrXoye
+    configuration:
+      source:
+        kind: SharePointSearchSource
+        site: https://studentcankayaedutr.sharepoint.com/Shared%20Documents
+
+  - kind: DialogComponent
+    version: 17209396
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:47.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:47.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: On Error
+    id: 35872135-1574-4df5-a7b7-f7e435f0e6eb
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This system topic triggers when the agent encounters an error. When using the test chat pane, the full error description is displayed.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.OnError
+    dialog:
+      beginDialog:
+        kind: OnError
+        id: main
+        actions:
+          - kind: SetVariable
+            id: setVariable_timestamp
+            variable: init:Topic.CurrentTime
+            value: =Text(Now(), DateTimeFormat.UTC)
+
+          - kind: ConditionGroup
+            id: condition_1
+            conditions:
+              - id: bL4wmY
+                condition: =System.Conversation.InTestMode = true
+                actions:
+                  - kind: SendActivity
+                    id: sendMessage_XJBYMo
+                    activity: |-
+                      Error Message: {System.Error.Message}
+                      Error Code: {System.Error.Code}
+                      Conversation Id: {System.Conversation.Id}
+                      Time (UTC): {Topic.CurrentTime}
+
+            elseActions:
+              - kind: SendActivity
+                id: sendMessage_dZ0gaF
+                activity:
+                  text:
+                    - |-
+                      An error has occurred.
+                      Error code: {System.Error.Code}
+                      Conversation Id: {System.Conversation.Id}
+                      Time (UTC): {Topic.CurrentTime}.
+                  speak:
+                    - An error has occurred, please try again.
+
+          - kind: LogCustomTelemetryEvent
+            id: 9KwEAn
+            eventName: OnErrorLog
+            properties: "={ErrorMessage: System.Error.Message, ErrorCode: System.Error.Code, TimeUTC: Topic.CurrentTime, ConversationId: System.Conversation.Id}"
+
+          - kind: CancelAllDialogs
+            id: NW7NyY
+
+  - kind: DialogComponent
+    version: 17209406
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:47.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:47.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Fallback
+    id: 3c83371f-e04b-49bf-b90e-27e93094d138
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This system topic triggers when the user's utterance does not match any existing topics.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Fallback
+    dialog:
+      beginDialog:
+        kind: OnUnknownIntent
+        id: main
+        actions:
+          - kind: ConditionGroup
+            id: conditionGroup_LktzXw
+            conditions:
+              - id: conditionItem_tlGIVo
+                condition: =System.FallbackCount < 3
+                actions:
+                  - kind: SendActivity
+                    id: sendMessage_QZreqo
+                    activity: I'm sorry, I'm not sure how to help with that. Can you try rephrasing?
+
+            elseActions:
+              - kind: BeginDialog
+                id: 5aXj5M
+                dialog: crb40_ecoRoutePlanner.topic.Escalate
+
+  - kind: DialogComponent
+    version: 17209426
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Reset Conversation
+    id: 448b004e-8c20-4dfe-8071-aafed235ed9a
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.ResetConversation
+    dialog:
+      startBehavior: UseLatestPublishedContentAndCancelOtherTopics
+      beginDialog:
+        kind: OnSystemRedirect
+        id: main
+        actions:
+          - kind: SendActivity
+            id: sendMessage_OPsT1O
+            activity: What can I help you with?
+
+          - kind: ClearAllVariables
+            id: clearAllVariables_73bTFR
+            variables: ConversationScopedVariables
+
+          - kind: CancelAllDialogs
+            id: cancelAllDialogs_12Gt21
+
+  - kind: DialogComponent
+    version: 17209430
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Escalate
+    id: 53a162ff-839e-4c33-97fb-19b9d0ece922
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: |-
+      This system topic is triggered when the user indicates they would like to speak to a representative.
+      You can configure how the agent will handle human hand-off scenarios in the agent settings..
+      If your agent does not handle escalations, this topic should be disabled.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.Escalate
+    dialog:
+      startBehavior: CancelOtherTopics
+      beginDialog:
+        kind: OnEscalate
+        id: main
+        intent:
+          displayName: Escalate
+          includeInOnSelectIntent: false
+          triggerQueries:
+            - Talk to agent
+            - Talk to a person
+            - Talk to someone
+            - Call back
+            - Call customer service
+            - Call me please
+            - Call support
+            - Call technical support
+            - Can an agent call me
+            - Can I call
+            - Can I get in touch with someone else
+            - Can I get real agent support
+            - Can I get transferred to a person to call
+            - Can I have a call in number Or can I be called
+            - Can I have a representative call me
+            - Can I schedule a call
+            - Can I speak to a representative
+            - Can I talk to a human
+            - Can I talk to a human assistant
+            - Can someone call me
+            - Chat with a human
+            - Chat with a representative
+            - Chat with agent
+            - Chat with someone please
+            - Connect me to a live agent
+            - Connect me to a person
+            - Could some one contact me by phone
+            - Customer agent
+            - Customer representative
+            - Customer service
+            - I need a manager to contact me
+            - I need customer service
+            - I need help from a person
+            - I need to speak with a live argent
+            - I need to talk to a specialist please
+            - I want to talk to customer service
+            - I want to proceed with live support
+            - I want to speak with a consultant
+            - I want to speak with a live tech
+            - I would like to speak with an associate
+            - I would like to talk to a technician
+            - Talk with tech support member
+
+        actions:
+          - kind: SendActivity
+            id: sendMessage_s39DCt
+            conversationOutcome: Escalated
+            activity: |-
+              Escalating to a representative is not currently configured for this agent, however this is where the agent could provide information about how to get in touch with someone another way.
+              
+              Is there anything else I can help you with?
+
+  - kind: DialogComponent
+    version: 17209391
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:47.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:47.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Thank you
+    id: 5c935e06-e8dd-4b26-a191-283ca901d3b3
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This topic triggers when the user says thank you.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.ThankYou
+    dialog:
+      beginDialog:
+        kind: OnRecognizedIntent
+        id: main
+        intent:
+          displayName: Thank you
+          includeInOnSelectIntent: false
+          triggerQueries:
+            - thanks
+            - thank you
+            - thanks so much
+            - ty
+
+        actions:
+          - kind: SendActivity
+            id: sendMessage_9iz6v7
+            activity: You're welcome.
+
+  - kind: GptComponent
+    version: 17209450
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:49.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:49.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: EcoRoute Planner
+    id: 7d9b093c-11f4-4702-89ea-747ed4d0c703
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: The EcoRoute Planner agent calculates travel distances, estimates travel times, computes CO2 emissions, personalizes calculations using vehicle data, compares transport options, and provides eco-friendly suggestions. It handles both simple and complex queries while being transparent and educational.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.gpt.default
+    metadata:
+      instructions: |-
+        - Calculate travel distance and environmental impact for any two locations.
+        - Personalize calculations using vehicle data.
+        - Compare options and suggest eco-friendly alternatives.
+        - Handle both simple and complex queries.
+        - Be transparent and educational.
+      gptCapabilities: {}
+      conversationStarters:
+        - title: Calculate Distance
+          text: Calculate the distance and CO2 emissions for a trip from New York to Los Angeles.
+
+        - title: Vehicle Emissions
+          text: How much CO2 does a 2020 Tesla emit on a 300km trip?
+
+        - title: Compare Transport Modes
+          text: Compare the pollution for flying vs. driving a 2005 Toyota Camry from Paris to Berlin.
+
+        - title: Eco-Friendly Suggestions
+          text: Suggest a more eco-friendly alternative for a diesel SUV emitting 200g CO2/km.
+
+        - title: Basic Distance Calculation
+          text: Calculate the distance between lat1, lon1 and lat2, lon2.
+
+        - title: Educational Disclaimer
+          text: Provide a disclaimer about the variability of emissions based on traffic, road conditions, and vehicle maintenance.
+
+  - kind: DialogComponent
+    version: 17209440
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:49.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:49.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Conversation Start
+    id: 82a1c10e-3cc9-4263-b3e2-3713076e856f
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: This system topic triggers when the agent receives an Activity indicating the beginning of a new conversation. If you do not want the agent to initiate the conversation, disable this topic.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.ConversationStart
+    dialog:
+      beginDialog:
+        kind: OnConversationStart
+        id: main
+        actions:
+          - kind: SendActivity
+            id: sendMessage_M0LuhV
+            activity:
+              text:
+                - Hello, I'm {System.Bot.Name}, a virtual assistant. Just so you are aware, I sometimes use AI to answer your questions. If you provided a website during creation, try asking me about it! Next try giving me some more knowledge by setting up generative AI.
+              speak:
+                - Hello and thank you for calling {System.Bot.Name}. Please note that some responses are generated by AI and may require verification for accuracy. How may I help you today?
+
+  - kind: DialogComponent
+    version: 17209435
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:48.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:48.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: End of Conversation
+    id: b6f01ef5-4044-4083-9db0-b4884867281c
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    description: |-
+      This system topic is only triggered by a redirect action,
+      and guides the user through rating their conversation with the agent.
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.EndofConversation
+    dialog:
+      startBehavior: CancelOtherTopics
+      beginDialog:
+        kind: OnSystemRedirect
+        id: main
+        actions:
+          - kind: Question
+            id: 41d42054-d4cb-4e90-b922-2b16b37fe379
+            conversationOutcome: ResolvedImplied
+            alwaysPrompt: true
+            variable: init:Topic.SurveyResponse
+            prompt: Did that answer your question?
+            entity: BooleanPrebuiltEntity
+
+          - kind: ConditionGroup
+            id: condition-0
+            conditions:
+              - id: condition-0-item-0
+                condition: =Topic.SurveyResponse = true
+                actions:
+                  - kind: CSATQuestion
+                    id: csat_1
+                    conversationOutcome: ResolvedConfirmed
+
+                  - kind: SendActivity
+                    id: sendMessage_8r29O0
+                    activity: Thanks for your feedback.
+
+                  - kind: Question
+                    id: question_1
+                    alwaysPrompt: true
+                    variable: init:Topic.Continue
+                    prompt: Can I help with anything else?
+                    entity: BooleanPrebuiltEntity
+
+                  - kind: ConditionGroup
+                    id: condition-1
+                    conditions:
+                      - id: condition-1-item-0
+                        condition: =Topic.Continue = true
+                        actions:
+                          - kind: SendActivity
+                            id: sendMessage_4eOE6h
+                            activity: Go ahead. I'm listening.
+
+                    elseActions:
+                      - kind: SendActivity
+                        id: yHBz55
+                        activity: Ok, goodbye.
+
+                      - kind: EndConversation
+                        id: jh1GMT
+
+            elseActions:
+              - kind: Question
+                id: PM68ot
+                alwaysPrompt: true
+                variable: init:Topic.TryAgain
+                prompt: Sorry I wasn't able to help better. Would you like to try again?
+                entity: BooleanPrebuiltEntity
+
+              - kind: ConditionGroup
+                id: KNxYBf
+                conditions:
+                  - id: DPveFP
+                    condition: =Topic.TryAgain = false
+                    actions:
+                      - kind: BeginDialog
+                        id: cngqi4
+                        dialog: crb40_ecoRoutePlanner.topic.Escalate
+
+                elseActions:
+                  - kind: SendActivity
+                    id: GrVHEW
+                    activity: Go ahead. I'm listening.
+
+  - kind: DialogComponent
+    version: 17209373
+    managedProperties:
+      isCustomizable: false
+      solutionId: fd140aae-4df4-11dd-bd17-0019b9312238
+
+    auditInfo:
+      createdTimeUtc: 2025-03-27T01:01:34.0000000Z
+      modifiedTimeUtc: 2025-03-27T01:01:34.0000000Z
+      createdBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+      modifiedBy: 7c9da31d-10a6-4b88-8b74-4e705efcbdef
+
+    displayName: Start Over
+    id: e78e1ad3-a2f7-4563-8da7-f138dbce22d6
+    parentBotId: 585921f2-a60a-f011-bae3-6045bd9dd962
+    shareContext: {}
+    state: Active
+    status: Active
+    publisherUniqueName: DefaultPublisherorg94142032
+    schemaName: crb40_ecoRoutePlanner.topic.StartOver
+    dialog:
+      beginDialog:
+        kind: OnRecognizedIntent
+        id: main
+        intent:
+          displayName: Start Over
+          includeInOnSelectIntent: false
+          triggerQueries:
+            - let's begin again
+            - start over
+            - start again
+            - restart
+
+        actions:
+          - kind: Question
+            id: question_zguoVV
+            alwaysPrompt: false
+            variable: init:Topic.Confirm
+            prompt: Are you sure you want to restart the conversation?
+            entity: BooleanPrebuiltEntity
+
+          - kind: ConditionGroup
+            id: conditionGroup_lvx2zV
+            conditions:
+              - id: conditionItem_sVQtHa
+                condition: =Topic.Confirm = true
+                actions:
+                  - kind: BeginDialog
+                    id: 0YKYsy
+                    dialog: crb40_ecoRoutePlanner.topic.ResetConversation
+
+            elseActions:
+              - kind: SendActivity
+                id: sendMessage_lk2CyQ
+                activity: Ok. Let's carry on.
